@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details - Amigo Clothing</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 3rem auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      padding: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+    .gallery {
+      flex: 1 1 350px;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .main-image-container {
+      width: 350px;
+      height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eee;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      margin-bottom: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .main-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+      background: transparent;
+      display: block;
+      margin: 0 auto;
+    }
+    .thumbnails {
+      display: flex;
+      gap: 10px;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .thumbnails img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid #ddd;
+      background: #fafafa;
+      transition: border 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .thumbnails img.selected {
+      border: 2px solid #e74c3c;
+      box-shadow: 0 2px 8px rgba(231,76,60,0.10);
+    }
+    .details {
+      flex: 2 1 350px;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .product-title {
+      font-size: 2.2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    .product-price {
+      font-size: 1.5rem;
+      color: #e74c3c;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    .product-description {
+      color: #555;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+    .actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .actions input[type="number"] {
+      width: 70px;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-right: 0.5rem;
+    }
+    .cta-button {
+      background: #e74c3c;
+      color: white;
+      padding: 0.9rem 2rem;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .cta-button:hover {
+      background: #c0392b;
+    }
+    .buy-now {
+      background: #e74c3c;
+    }
+    .buy-now:hover {
+      background: #c0392b;
+    }
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+      .gallery, .details {
+        min-width: 0;
+        width: 100%;
+      }
+      .main-image-container {
+        width: 100vw;
+        max-width: 350px;
+        height: 100vw;
+        max-height: 350px;
+      }
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      color: black;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover {
+      color: #e74c3c;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="product-container" style="display:none;">
+    <div class="gallery">
+      <div class="main-image-container">
+        <img id="main-image" class="main-image" src="" alt="Product image">
+      </div>
+      <div class="thumbnails" id="thumbnails"></div>
+    </div>
+    <div class="details">
+      <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Products</a>
+      <div class="product-title" id="product-title"></div>
+      <div class="product-price" id="product-price"></div>
+      <div class="product-description" id="product-description"></div>
+      <div class="actions">
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" min="1" value="1">
+        <button class="cta-button" id="add-to-cart">Add to Cart</button>
+        <button class="cta-button buy-now" id="buy-now">Buy Now</button>
+      </div>
+    </div>
+  </div>
+  <div id="loading" style="text-align:center;margin-top:4rem;font-size:1.2rem;color:#888;">Loading product...</div>
+  <div id="error" style="display:none;text-align:center;margin-top:4rem;font-size:1.2rem;color:red;">Product not found.</div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.mv"></script>
+  <script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Get product ID from URL
+    function getProductId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    // UI Elements
+    const productContainer = document.getElementById('product-container');
+    const mainImage = document.getElementById('main-image');
+    const thumbnails = document.getElementById('thumbnails');
+    const productTitle = document.getElementById('product-title');
+    const productPrice = document.getElementById('product-price');
+    const productDescription = document.getElementById('product-description');
+    const quantityInput = document.getElementById('quantity');
+    const addToCartBtn = document.getElementById('add-to-cart');
+    const buyNowBtn = document.getElementById('buy-now');
+    const loading = document.getElementById('loading');
+    const errorDiv = document.getElementById('error');
+
+    let productData = null;
+    let selectedImageIdx = 0;
+
+    function renderProduct(product) {
+      productTitle.textContent = product.name;
+      productPrice.textContent = `P${parseFloat(product.price).toFixed(2)}`;
+      productDescription.textContent = product.description || '';
+      // Images
+      let images = Array.isArray(product.images) && product.images.length > 0 ? product.images : ["https://via.placeholder.com/350x350?text=No+Image"];
+      mainImage.src = images[selectedImageIdx] || images[0];
+      thumbnails.innerHTML = '';
+      images.forEach((url, idx) => {
+        const thumb = document.createElement('img');
+        thumb.src = url;
+        thumb.className = idx === selectedImageIdx ? 'selected' : '';
+        thumb.onclick = () => {
+          selectedImageIdx = idx;
+          renderProduct(product);
+        };
+        thumbnails.appendChild(thumb);
+      });
+    }
+
+    // Fetch product from Firestore
+    async function fetchProduct() {
+      const id = getProductId();
+      if (!id) {
+        loading.style.display = 'none';
+        errorDiv.style.display = 'block';
+        return;
+      }
+      try {
+        const doc = await db.collection('product').doc(id).get();
+        if (!doc.exists) {
+          loading.style.display = 'none';
+          errorDiv.style.display = 'block';
+          return;
+        }
+        productData = doc.data();
+        loading.style.display = 'none';
+        productContainer.style.display = 'flex';
+        renderProduct(productData);
+      } catch (err) {
+        loading.style.display = 'none';
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    addToCartBtn.onclick = function() {
+      alert(`${productData.name} (x${quantityInput.value}) added to cart!`);
+    };
+    buyNowBtn.onclick = function() {
+      alert(`Proceeding to buy ${productData.name} (x${quantityInput.value})!`);
+    };
+
+    fetchProduct();
+  </script>
+     <!-- Disable right-click and common dev tools shortcuts -->
+     <script>
+      (function() {
+          document.addEventListener('contextmenu', function(e) {
+              e.preventDefault();
+          });
+          document.addEventListener('keydown', function(e) {
+              // F12
+              if (e.key === 'F12') {
+                  e.preventDefault();
+              }
+              // Ctrl+Shift+I or Ctrl+Shift+J or Ctrl+U
+              if ((e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+                  (e.ctrlKey && e.key === 'U')) {
+                  e.preventDefault();
+              }
+          });
+      })();
+  </script>
+</body>
+</html> 

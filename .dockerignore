@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+package-lock.json
+package.json
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Documentation
+README.md
+*.md
+
+# Development files
+.env
+.env.local
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts (if any)
+dist/
+build/
+*.log
+
+# Firebase config (if sensitive)
+firebase-config.mv
+

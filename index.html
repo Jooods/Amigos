@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Amigo Clothing - Fashion Store</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: black;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #e74c3c;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-icons a {
+            color: #333;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-icons a:hover {
+            color: #e74c3c;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: url('assets/amigo.jpg') center center/cover no-repeat;
+            position: relative;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .hero-content {
+            color: white;
+            background: rgba(0,0,0,0.4); /* Optional: dark overlay for readability */
+            padding: 2rem 3rem;
+            border-radius: 12px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: #e74c3c;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: #c0392b;
+        }
+
+        /* Products Section */
+        .products {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+
+        .add-to-cart {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        .add-to-cart:hover {
+            background: #c0392b;
+        }
+
+        /* About Section */
+        .about {
+            background: #f8f9fa;
+            padding: 4rem 2rem;
+        }
+
+        .about-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .about-text p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        .about-image {
+            background: #ddd;
+            height: 400px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #999;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-info p {
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .contact-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Footer */
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <img src="assets/LOGO BLACK1.png" alt="Amigo Clothing Logo" class="logo-image">
+            <div class="logo">Amigo Clothing</div>  
+            
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#" id="login-icon"><i class="fas fa-user"></i></a>
+                <a href="cart.html"><i class="fas fa-shopping-cart"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Welcome to Amigo Clothing</h1>
+            <p>Discover the latest trends in fashion and style</p>
+            <button class="cta-button" id="shop-now">Shop Now</button>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="products">
+        <h2 class="section-title">Our Products</h2>
+        <div class="products-grid" id="products-grid">
+            <!-- Products will be dynamically inserted here -->
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="about-content">
+            <div class="about-text">
+                <h2>About Amigo Clothing</h2>
+                <p>Amigo Clothing believed that things are never quite as scary when you've got a real amigo and also clothing has progressed to the point where it makes an impression. Amigo Clothing Co. will enhance your style statement. As the saying goes, first impressions are everything, so make sure yours is memorable. Wearing cool and funky clothes makes you look good and reflects your preferences and choices. Wearing clothes that make you look good and your body attractive will draw attention and boost your confidence. As you see heads turning towards you, embrace your confidence and individuality by wearing the most fashionable clothes.</p>
+                <p>100% of what we produce is created in the Philippines. Our garment materials were prepared by the most skilled sewers, and our fabric was produced by the top fabric supplier in the Philippines. We chose local resources so that we could support local businesses.</p>
+            </div>
+            <div class="about-image">
+                <img src="assets/IMG_2689 cropted.png" width="100%" height="150%" alt="">
+            </div>                      
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <h2 class="section-title">Contact Us</h2>
+        <div class="contact-grid">
+            <div class="contact-info">
+                <h3>Get in Touch</h3>
+                <p><i class="fas fa-map-marker-alt"></i> BLK45 LOT 65 PHASE4, ALTA TIERRA HOMES, Biñan, Cavite</p>
+                <p><i class="fas fa-phone"></i> +63 945 4900 399</p>
+                <p><i class="fas fa-envelope"></i> kalamasiledoj@gmail.com</p>
+                <p><i class="fas fa-clock"></i> Mon-Fri: 9AM-6PM, Sat: 10AM-4PM</p>
+            </div>
+            <div class="contact-form">
+                <form>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Amigo Clothing. All rights reserved.</p>
+    </footer>
+
+    <!-- Login/Signup Modal -->
+    <div id="login-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:2000;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:2rem 2rem 1.5rem 2rem;border-radius:10px;max-width:350px;width:90vw;box-shadow:0 5px 20px rgba(0,0,0,0.2);position:relative;max-height:90vh;overflow-y:auto;">
+        <button id="close-login-modal" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.2rem;cursor:pointer;">&times;</button>
+        <div id="login-form-section">
+          <h2 style="text-align:center;color:#e74c3c;margin-bottom:1rem;">Login</h2>
+          <div id="modal-login-error" style="color:red;text-align:center;display:none;margin-bottom:0.5rem;"></div>
+          <form id="modal-login-form">
+            <div class="form-group">
+              <label for="modal-username">Username or Email</label>
+              <input type="text" id="modal-username" required autocomplete="username" style="width:100%;padding:0.7rem;margin-bottom:0.7rem;">
+            </div>
+            <div class="form-group">
+              <label for="modal-password">Password</label>
+              <input type="password" id="modal-password" required autocomplete="current-password" style="width:100%;padding:0.7rem;margin-bottom:1rem;">
+            </div>
+            <button type="submit" class="cta-button" style="width:100%;">Login</button>
+          </form>
+          <div style="text-align:center;margin-top:1rem;">
+            <span>Don't have an account? <a href="#" id="show-signup" style="color:#764ba2;cursor:pointer;">Sign up</a></span>
+          </div>
+        </div>
+        <div id="signup-form-section" style="display:none;">
+          <h2 style="text-align:center;color:#764ba2;margin-bottom:1rem;">Sign Up</h2>
+          <div id="modal-signup-error" style="color:red;text-align:center;display:none;margin-bottom:0.5rem;"></div>
+          <div id="modal-signup-success" style="color:green;text-align:center;display:none;margin-bottom:0.5rem;"></div>
+          <form id="modal-signup-form">
+            <div class="form-group">
+              <label for="signup-firstname">First Name</label>
+              <input type="text" id="signup-firstname" required style="width:100%;padding:0.7rem;margin-bottom:0.7rem;">
+            </div>
+            <div class="form-group">
+              <label for="signup-lastname">Last Name</label>
+              <input type="text" id="signup-lastname" required style="width:100%;padding:0.7rem;margin-bottom:0.7rem;">
+            </div>
+            <div class="form-group">
+              <label for="signup-phone">Phone Number</label>
+              <input type="tel" id="signup-phone" required style="width:100%;padding:0.7rem;margin-bottom:0.7rem;">
+            </div>
+            <div class="form-group">
+              <label for="signup-address">Complete Address</label>
+              <input type="text" id="signup-address" required style="width:100%;padding:0.7rem;margin-bottom:0.7rem;">
+            </div>
+            <div class="form-group">
+              <label for="signup-email">Email</label>
+              <input type="email" id="signup-email" required style="width:100%;padding:0.7rem;margin-bottom:0.7rem;">
+            </div>
+            <div class="form-group">
+              <label for="signup-password">Password</label>
+              <input type="password" id="signup-password" required style="width:100%;padding:0.7rem;margin-bottom:0.7rem;">
+            </div>
+            <div class="form-group">
+              <label for="signup-confirm">Confirm Password</label>
+              <input type="password" id="signup-confirm" required style="width:100%;padding:0.7rem;margin-bottom:1rem;">
+            </div>
+            <button type="submit" class="cta-button" style="width:100%;background:#764ba2;">Sign Up</button>
+          </form>
+          <div style="text-align:center;margin-top:1rem;">
+            <span>Already have an account? <a href="#" id="show-login" style="color:#e74c3c;cursor:pointer;">Login</a></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:3000;align-items:center;justify-content:center;">
+      <div id="product-modal-content" style="background:#fff;padding:2rem 2rem 1.5rem 2rem;border-radius:10px;max-width:500px;width:95vw;box-shadow:0 5px 20px rgba(0,0,0,0.2);position:relative;">
+        <button id="close-product-modal" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.2rem;cursor:pointer;">&times;</button>
+        <div id="modal-images" style="display:flex;gap:8px;overflow-x:auto;margin-bottom:1rem;"></div>
+        <h2 id="modal-title" style="margin-bottom:0.5rem;"></h2>
+        <p id="modal-price" style="color:#e74c3c;font-weight:bold;margin-bottom:0.5rem;"></p>
+        <p id="modal-description" style="color:#666;margin-bottom:1rem;"></p>
+        <div style="margin-bottom:1rem;">
+          <label for="modal-quantity">Quantity:</label>
+          <input type="number" id="modal-quantity" min="1" value="1" style="width:60px;padding:0.3rem;margin-left:0.5rem;">
+        </div>
+        <div style="display:flex;gap:1rem;">
+          <button id="modal-add-to-cart" class="cta-button" style="flex:1;">Add to Cart</button>
+          <button id="modal-buy-now" class="cta-button" style="flex:1;background:#764ba2;">Buy Now</button>
+        </div>
+      </div>
+    </div>
+    <!-- Account Info Modal -->
+    <div id="account-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:2000;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:2rem 2rem 1.5rem 2rem;border-radius:10px;max-width:350px;width:90vw;box-shadow:0 5px 20px rgba(0,0,0,0.2);position:relative;max-height:90vh;overflow-y:auto;">
+        <button id="close-account-modal" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.2rem;cursor:pointer;">&times;</button>
+        <h2 style="text-align:center;color:#764ba2;margin-bottom:1rem;">My Account</h2>
+        <div id="account-info" style="margin-bottom:1.5rem;"></div>
+        <a href="cart.html" class="cta-button" style="width:100%;display:block;text-align:center;background:#e74c3c;">View Cart</a>
+        <button id="logout-btn" class="cta-button" style="width:100%;margin-top:1rem;background:#888;">Sign Out</button>
+      </div>
+    </div>
+    <script>
+        document.getElementById('shop-now').addEventListener('click', function() {
+            window.location.href = '#products';
+        });
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.mv"></script>
+    <script>
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth(); // Declare auth ONCE here
+        let currentCustomer = null;   // Declare currentCustomer ONCE here
+
+        // Product modal logic
+        const productModal = document.getElementById('product-modal');
+        const productModalContent = document.getElementById('product-modal-content');
+        const closeProductModal = document.getElementById('close-product-modal');
+        const modalImages = document.getElementById('modal-images');
+        const modalTitle = document.getElementById('modal-title');
+        const modalPrice = document.getElementById('modal-price');
+        const modalDescription = document.getElementById('modal-description');
+        const modalQuantity = document.getElementById('modal-quantity');
+        const modalAddToCart = document.getElementById('modal-add-to-cart');
+        const modalBuyNow = document.getElementById('modal-buy-now');
+        let currentProduct = null;
+
+        function openProductModal(product) {
+          currentProduct = product;
+          // Images
+          modalImages.innerHTML = '';
+          if (Array.isArray(product.images) && product.images.length > 0) {
+            product.images.forEach(url => {
+              const img = document.createElement('img');
+              img.src = url;
+              img.style.width = '70px';
+              img.style.height = '70px';
+              img.style.objectFit = 'cover';
+              img.style.borderRadius = '6px';
+              img.style.cursor = 'pointer';
+              img.onclick = () => {
+                // Show as main image (swap to first position)
+                product.images = [url, ...product.images.filter(u => u !== url)];
+                openProductModal(product);
+              };
+              modalImages.appendChild(img);
+            });
+          } else {
+            modalImages.innerHTML = '<div style="width:70px;height:70px;background:#eee;border-radius:6px;"></div>';
+          }
+          // Main info
+          modalTitle.textContent = product.name;
+          modalPrice.textContent = `$${parseFloat(product.price).toFixed(2)}`;
+          modalDescription.textContent = product.description || '';
+          modalQuantity.value = 1;
+          productModal.style.display = 'flex';
+        }
+
+        closeProductModal.onclick = function() {
+          productModal.style.display = 'none';
+        };
+        productModal.addEventListener('click', function(e) {
+          if (e.target === productModal) productModal.style.display = 'none';
+        });
+
+        modalAddToCart.onclick = function() {
+          alert(`${currentProduct.name} (x${modalQuantity.value}) added to cart!`);
+        };
+        modalBuyNow.onclick = function() {
+          alert(`Proceeding to buy ${currentProduct.name} (x${modalQuantity.value})!`);
+        };
+
+        // Fetch products from Firestore and render them
+        function renderProducts(products) {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+            products.forEach(doc => {
+                const data = doc.data();
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.style.cursor = 'pointer';
+                // Use first image from images array, fallback to placeholder
+                let imgUrl = (Array.isArray(data.images) && data.images.length > 0) ? data.images[0] : 'https://via.placeholder.com/300x250?text=No+Image';
+                card.innerHTML = `
+                    <div class="product-image">
+                        <img src="${imgUrl}" alt="${data.name}" style="width:100%;height:100%;object-fit:contain;display:block;background:#f8f9fa;">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${data.name}</h3>
+                        <p class="product-price">P${parseFloat(data.price).toFixed(2)}</p>
+                        <button class="add-to-cart">Add to Cart</button>
+                    </div>
+                `;
+                card.onclick = (e) => {
+                  // Only open product page if not clicking Add to Cart
+                  if (e.target.classList.contains('add-to-cart')) return;
+                  window.location.href = `product.html?id=${doc.id}`;
+                };
+                // Add to Cart button logic
+                card.querySelector('.add-to-cart').onclick = async function(e) {
+                  e.stopPropagation();
+                  if (!currentCustomer) {
+                    loginModal.style.display = 'flex';
+                    return;
+                  }
+                  // Add to cart in Firestore
+                  const user = auth.currentUser;
+                  if (!user) return;
+                  const cartRef = firebase.firestore().collection('cart').doc(user.uid);
+                  const cartDoc = await cartRef.get();
+                  let items = (cartDoc.exists && Array.isArray(cartDoc.data().items)) ? cartDoc.data().items : [];
+                  // Check if product already in cart
+                  const idx = items.findIndex(item => item.id === doc.id);
+                  if (idx > -1) {
+                    items[idx].quantity = (parseInt(items[idx].quantity) || 1) + 1;
+                  } else {
+                    items.push({
+                      id: doc.id, // Always include this for cart reference
+                      name: data.name,
+                      price: data.price,
+                      images: data.images,
+                      quantity: 1,
+                      userId: user.uid // for extra clarity
+                    });
+                  }
+                  await cartRef.set({ items, userId: user.uid }, { merge: true });
+                  alert('Added to cart!');
+                };
+                grid.appendChild(card);
+            });
+        }
+
+        function fetchProducts() {
+            db.collection('product').get()
+                .then(snapshot => {
+                    renderProducts(snapshot.docs);
+                })
+                .catch(error => {
+                    document.getElementById('products-grid').innerHTML = '<p style="color:red;">Failed to load products.</p>';
+                    console.error('Error fetching products:', error);
+                });
+        }
+
+        // Fetch products on page load
+        window.addEventListener('DOMContentLoaded', fetchProducts);
+
+      // Disable Add to Cart for guests (on product modal)
+      function updateAddToCartButtons() {
+        const addToCartBtns = document.querySelectorAll('.add-to-cart, #modal-add-to-cart');
+        addToCartBtns.forEach(btn => {
+          if (!currentCustomer) {
+            btn.disabled = true;
+            btn.title = 'Please log in to add to cart.';
+            btn.style.opacity = 0.6;
+            btn.onclick = function() {
+              loginModal.style.display = 'flex';
+            };
+          } else {
+            btn.disabled = false;
+            btn.title = '';
+            btn.style.opacity = 1;
+          }
+        });
+      }
+      // Call this after rendering products and on auth state change
+      auth.onAuthStateChanged(() => {
+        updateAddToCartButtons();
+      });
+    </script>
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add to cart functionality
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const productName = this.parentElement.querySelector('.product-title').textContent;
+                alert(`${productName} added to cart!`);
+            });
+        });
+
+        // Form submission
+        const contactForm = document.querySelector('form');
+        if (contactForm) {
+          contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+            const subject = encodeURIComponent('Contact Form Message from ' + name);
+            const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=kalamasiledoj@gmail.com&su=${subject}&body=${body}`;
+            window.open(gmailUrl, '_blank');
+            contactForm.reset();
+          });
+        }
+
+      // Login/Signup Modal Logic
+      const loginIcon = document.getElementById('login-icon');
+      const loginModal = document.getElementById('login-modal');
+      const closeLoginModal = document.getElementById('close-login-modal');
+      const loginFormSection = document.getElementById('login-form-section');
+      const signupFormSection = document.getElementById('signup-form-section');
+      const showSignup = document.getElementById('show-signup');
+      const showLogin = document.getElementById('show-login');
+      const modalLoginForm = document.getElementById('modal-login-form');
+      const modalLoginError = document.getElementById('modal-login-error');
+      const modalSignupForm = document.getElementById('modal-signup-form');
+      const modalSignupError = document.getElementById('modal-signup-error');
+      const modalSignupSuccess = document.getElementById('modal-signup-success');
+
+      loginIcon.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const user = auth.currentUser;
+        if (user && user.emailVerified) {
+          // Fetch customer info from Firestore
+          let customer = currentCustomer;
+          if (!customer) {
+            const doc = await firebase.firestore().collection('customer').doc(user.uid).get();
+            customer = doc.exists ? doc.data() : null;
+          }
+          // Fetch orders for this user
+          let orders = [];
+          try {
+            const ordersSnap = await firebase.firestore().collection('orders').where('userId', '==', user.uid).get();
+            orders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+          } catch (err) {
+            orders = [];
+          }
+          if (customer) {
+            let html = '';
+            html += `<div style='margin-bottom:0.7rem;'><strong>Name:</strong> ${customer.fullName || ''}</div>`;
+            html += `<div style='margin-bottom:0.7rem;'><strong>Email:</strong> ${customer.email || ''}</div>`;
+            html += `<div style='margin-bottom:0.7rem;'><strong>Phone:</strong> ${customer.phone || ''}</div>`;
+            html += `<div style='margin-bottom:0.7rem;'><strong>Address:</strong> ${customer.address || ''}</div>`;
+            html += `<div style='margin-top:1.2em;display:flex;flex-direction:column;gap:0.7em;'>`;
+            html += `<a href='pending-orders.html' class='cta-button' style='background:#f39c12;'>View Pending Orders</a>`;
+            html += `<a href='delivery-orders.html' class='cta-button' style='background:#27ae60;'>View Delivery Orders</a>`;
+            html += `<a href='cancelled-orders.html' class='cta-button' style='background:#888;'>View Cancelled Orders</a>`;
+            html += `</div>`;
+            accountInfoDiv.innerHTML = html;
+            accountModal.style.display = 'flex';
+            return;
+          }
+        }
+        // Not logged in or not verified
+        loginModal.style.display = 'flex';
+        modalLoginError.style.display = 'none';
+        modalSignupError.style.display = 'none';
+        modalSignupSuccess.style.display = 'none';
+        modalLoginForm.reset();
+        modalSignupForm.reset();
+        loginFormSection.style.display = '';
+        signupFormSection.style.display = 'none';
+      });
+      closeLoginModal.addEventListener('click', function() {
+        loginModal.style.display = 'none';
+      });
+      loginModal.addEventListener('click', function(e) {
+        if (e.target === loginModal) loginModal.style.display = 'none';
+      });
+      showSignup.addEventListener('click', function(e) {
+        e.preventDefault();
+        loginFormSection.style.display = 'none';
+        signupFormSection.style.display = '';
+        modalSignupError.style.display = 'none';
+        modalSignupSuccess.style.display = 'none';
+        modalSignupForm.reset();
+      });
+      showLogin.addEventListener('click', function(e) {
+        e.preventDefault();
+        loginFormSection.style.display = '';
+        signupFormSection.style.display = 'none';
+        modalLoginError.style.display = 'none';
+        modalLoginForm.reset();
+      });
+
+      // Firebase Auth
+
+      // Login logic (admin or customer)
+      modalLoginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = document.getElementById('modal-username').value;
+        const pass = document.getElementById('modal-password').value;
+        if (user === 'admin' && pass === 'admin123') {
+          window.location.href = 'admin.html';
+        } else {
+          // Try Firebase Auth login
+          auth.signInWithEmailAndPassword(user, pass)
+            .then(() => {
+              const currentUser = auth.currentUser;
+              if (currentUser && !currentUser.emailVerified) {
+                auth.signOut();
+                modalLoginError.textContent = 'Please verify your email before logging in.';
+                modalLoginError.style.display = 'block';
+                return;
+              }
+              // Redirect to admin.html if UID matches admin UID
+             
+              loginModal.style.display = 'none';
+              alert('Login successful!');
+            })
+            .catch(err => {
+              modalLoginError.textContent = err.message;
+              modalLoginError.style.display = 'block';
+            });
+        }
+      });
+
+      // Signup logic
+      modalSignupForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const firstname = document.getElementById('signup-firstname').value.trim();
+        const lastname = document.getElementById('signup-lastname').value.trim();
+        const phone = document.getElementById('signup-phone').value.trim();
+        const address = document.getElementById('signup-address').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const pass = document.getElementById('signup-password').value;
+        const confirm = document.getElementById('signup-confirm').value;
+        modalSignupError.style.display = 'none';
+        modalSignupSuccess.style.display = 'none';
+        if (pass !== confirm) {
+          modalSignupError.textContent = 'Passwords do not match.';
+          modalSignupError.style.display = 'block';
+          return;
+        }
+        auth.createUserWithEmailAndPassword(email, pass)
+          .then(async (userCredential) => {
+            const user = userCredential.user;
+            // Send email verification
+            await user.sendEmailVerification()
+              .then(() => {
+                console.log('Verification email sent!');
+              })
+              .catch(err => {
+                console.error('Verification email error:', err);
+                modalSignupError.textContent = 'Failed to send verification email: ' + err.message;
+                modalSignupError.style.display = 'block';
+              });
+            // Store customer info in Firestore
+            await firebase.firestore().collection('customer').doc(user.uid).set({
+              firstName: firstname,
+              lastName: lastname,
+              fullName: firstname + ' ' + lastname,
+              phone: phone,
+              address: address,
+              email: email,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            modalSignupSuccess.textContent = 'Sign up successful! Please verify your email before logging in.';
+            modalSignupSuccess.style.display = 'block';
+            setTimeout(() => {
+              loginFormSection.style.display = '';
+              signupFormSection.style.display = 'none';
+              modalSignupSuccess.style.display = 'none';
+            }, 2500);
+          })
+          .catch(err => {
+            modalSignupError.textContent = err.message;
+            modalSignupError.style.display = 'block';
+          });
+      });
+
+      // Account Modal Logic
+      const accountModal = document.getElementById('account-modal');
+      const closeAccountModal = document.getElementById('close-account-modal');
+      const accountInfoDiv = document.getElementById('account-info');
+      const logoutBtn = document.getElementById('logout-btn');
+
+      // Listen for auth state changes
+      auth.onAuthStateChanged(async (user) => {
+        if (user && user.emailVerified) {
+          // Fetch customer info from Firestore
+          const doc = await firebase.firestore().collection('customer').doc(user.uid).get();
+          currentCustomer = doc.exists ? doc.data() : null;
+        } else {
+          currentCustomer = null;
+        }
+      });
+
+      loginIcon.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const user = auth.currentUser;
+        if (user && user.emailVerified) {
+          // Fetch customer info from Firestore
+          let customer = currentCustomer;
+          if (!customer) {
+            const doc = await firebase.firestore().collection('customer').doc(user.uid).get();
+            customer = doc.exists ? doc.data() : null;
+          }
+          // Fetch orders for this user
+          let orders = [];
+          try {
+            const ordersSnap = await firebase.firestore().collection('orders').where('userId', '==', user.uid).get();
+            orders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+          } catch (err) {
+            orders = [];
+          }
+          if (customer) {
+            let html = '';
+            html += `<div style='margin-bottom:0.7rem;'><strong>Name:</strong> ${customer.fullName || ''}</div>`;
+            html += `<div style='margin-bottom:0.7rem;'><strong>Email:</strong> ${customer.email || ''}</div>`;
+            html += `<div style='margin-bottom:0.7rem;'><strong>Phone:</strong> ${customer.phone || ''}</div>`;
+            html += `<div style='margin-bottom:0.7rem;'><strong>Address:</strong> ${customer.address || ''}</div>`;
+            html += `<div style='margin-top:1.2em;display:flex;flex-direction:column;gap:0.7em;'>`;
+            html += `<a href='pending-orders.html' class='cta-button' style='background:#f39c12;'>View Pending Orders</a>`;
+            html += `<a href='delivery-orders.html' class='cta-button' style='background:#27ae60;'>View Delivery Orders</a>`;
+            html += `<a href='cancelled-orders.html' class='cta-button' style='background:#888;'>View Cancelled Orders</a>`;
+            html += `</div>`;
+            accountInfoDiv.innerHTML = html;
+            accountModal.style.display = 'flex';
+            return;
+          }
+        }
+        // Not logged in or not verified
+        loginModal.style.display = 'flex';
+        modalLoginError.style.display = 'none';
+        modalSignupError.style.display = 'none';
+        modalSignupSuccess.style.display = 'none';
+        modalLoginForm.reset();
+        modalSignupForm.reset();
+        loginFormSection.style.display = '';
+        signupFormSection.style.display = 'none';
+      });
+      closeAccountModal.addEventListener('click', function() {
+        accountModal.style.display = 'none';
+      });
+      accountModal.addEventListener('click', function(e) {
+        if (e.target === accountModal) accountModal.style.display = 'none';
+      });
+      logoutBtn.addEventListener('click', function() {
+        auth.signOut();
+        accountModal.style.display = 'none';
+        alert('Signed out successfully.');
+      });
+    </script>
+    <!-- Disable right-click and common dev tools shortcuts -->
+    <script>
+        (function() {
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+            document.addEventListener('keydown', function(e) {
+                // F12
+                if (e.key === 'F12') {
+                    e.preventDefault();
+                }
+                // Ctrl+Shift+I or Ctrl+Shift+J or Ctrl+U
+                if ((e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+                    (e.ctrlKey && e.key === 'U')) {
+                    e.preventDefault();
+                }
+            });
+        })();
+    </script>
+</body>
+</html> 

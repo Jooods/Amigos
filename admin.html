@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amigo Clothing Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 3rem auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        h2 {
+            text-align: center;
+            color: #e74c3c;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        .btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #c0392b;
+        }
+        .product-list {
+            margin-top: 2rem;
+        }
+        .product-item {
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .product-info {
+            flex: 1;
+        }
+        .product-actions button {
+            margin-left: 0.5rem;
+        }
+        .logout-btn {
+            float: right;
+            background: #888;
+        }
+        .error {
+            color: red;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .success {
+            color: green;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        @media (max-width: 700px) {
+            .container { max-width: 98vw; padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="admin-dashboard">
+        <nav style="display:flex;gap:1.5rem;justify-content:center;margin-bottom:2rem;">
+            <a href="#" id="nav-product" style="color:#e74c3c;font-weight:bold;text-decoration:underline;">Product</a>
+            <a href="#" id="nav-pending" style="color:#888;">Pending</a>
+            <a href="#" id="nav-delivery" style="color:#888;">Delivery</a>
+            <a href="#" id="nav-cancelled" style="color:#888;">Cancelled</a>
+            <a href="#" id="nav-customers" style="color:#888;">Customer List</a>
+        </nav>
+        <div id="section-product">
+       
+        <h2>Product Management</h2>
+        <div class="success" id="success-msg" style="display:none;"></div>
+        <div class="error" id="error-msg" style="display:none;"></div>
+        <form id="product-form">
+            <input type="hidden" id="product-id">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" id="price" required min="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Images</label>
+                <div id="image-list" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:0.5rem;"></div>
+                <input type="file" id="image-upload" accept="image/*" style="display:none;">
+                <button type="button" class="btn" id="add-image-btn" style="margin-bottom:0.5rem;">Add Image</button>
+                <div id="image-upload-status" style="color:#888;font-size:0.95em;"></div>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" required min="0">
+            </div>
+            <button type="submit" class="btn" id="save-btn">Add Product</button>
+            <button type="button" class="btn" id="cancel-edit" style="display:none;background:#888;">Cancel</button>
+        </form>
+        <div class="product-list" id="product-list"></div>
+        <button class="btn logout-btn" id="signout-btn" style="float:right;">Sign Out</button>
+        </div>
+        <div id="section-pending" style="display:none;"><h2>Pending Orders</h2><div id="pending-list"></div></div>
+        <div id="section-delivery" style="display:none;"><h2>Delivery Orders</h2><div id="delivery-list"></div></div>
+        <div id="section-cancelled" style="display:none;"><h2>Cancelled Orders</h2><div id="cancelled-list"></div></div>
+        <div id="section-customers" style="display:none;"><h2>Customer List</h2><div id="customer-list"></div></div>
+    </div>
+    
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.mv"></script>
+    <script>
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Product CRUD
+        const productForm = document.getElementById('product-form');
+        const productList = document.getElementById('product-list');
+        const successMsg = document.getElementById('success-msg');
+        const errorMsg = document.getElementById('error-msg');
+        const cancelEditBtn = document.getElementById('cancel-edit');
+        let editingId = null;
+
+        function showSuccess(msg) {
+            successMsg.textContent = msg;
+            successMsg.style.display = 'block';
+            setTimeout(() => successMsg.style.display = 'none', 2000);
+        }
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.style.display = 'block';
+            setTimeout(() => errorMsg.style.display = 'none', 3000);
+        }
+
+        // Image upload logic (deferred upload)
+        const imageList = document.getElementById('image-list');
+        const imageUpload = document.getElementById('image-upload');
+        const addImageBtn = document.getElementById('add-image-btn');
+        const imageUploadStatus = document.getElementById('image-upload-status');
+        let imageFiles = [];
+        let imageUrls = [];
+
+        function renderImages() {
+            imageList.innerHTML = '';
+            imageFiles.forEach((file, idx) => {
+                const div = document.createElement('div');
+                div.style.position = 'relative';
+                const url = URL.createObjectURL(file);
+                div.innerHTML = `<img src="${url}" style="width:60px;height:60px;object-fit:cover;border-radius:4px;">
+                    <button type="button" style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:1rem;" title="Remove">&times;</button>`;
+                div.querySelector('button').onclick = () => {
+                    imageFiles.splice(idx, 1);
+                    renderImages();
+                };
+                imageList.appendChild(div);
+            });
+        }
+
+        addImageBtn.onclick = () => {
+            imageUpload.click();
+        };
+
+        imageUpload.onchange = function() {
+            if (!this.files || !this.files[0]) return;
+            const file = this.files[0];
+            imageFiles.push(file);
+            renderImages();
+            this.value = '';
+        };
+
+        function clearForm() {
+            productForm.reset();
+            editingId = null;
+            imageFiles = [];
+            imageUrls = [];
+            renderImages();
+            document.getElementById('product-id').value = '';
+            document.getElementById('save-btn').textContent = 'Add Product';
+            cancelEditBtn.style.display = 'none';
+        }
+
+        async function uploadAllImages(files) {
+            const urls = [];
+            for (let file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', 'amigoclothing');
+                try {
+                    const res = await fetch('https://api.cloudinary.com/v1_1/deedseyr0/image/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (data.secure_url) {
+                        urls.push(data.secure_url);
+                    } else {
+                        throw new Error('Upload failed');
+                    }
+                } catch (err) {
+                    throw err;
+                }
+            }
+            return urls;
+        }
+
+        productForm.onsubmit = async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const price = parseFloat(document.getElementById('price').value);
+            const description = document.getElementById('description').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            if (imageFiles.length === 0) {
+                showError('Please upload at least one image.');
+                return;
+            }
+            imageUploadStatus.textContent = 'Uploading images...';
+            document.getElementById('save-btn').disabled = true;
+            try {
+                const urls = await uploadAllImages(imageFiles);
+                imageUploadStatus.textContent = '';
+                document.getElementById('save-btn').disabled = false;
+                if (editingId) {
+                    // Update
+                    db.collection('product').doc(editingId).update({
+                        name, price, description, images: urls, Quantity: quantity
+                    }).then(() => {
+                        showSuccess('Product updated!');
+                        clearForm();
+                        loadProducts();
+                    }).catch(err => showError('Update failed.'));
+                } else {
+                    // Add
+                    db.collection('product').add({
+                        name, price, description, images: urls, Quantity: quantity
+                    }).then(() => {
+                        showSuccess('Product added!');
+                        clearForm();
+                        loadProducts();
+                    }).catch(err => showError('Add failed.'));
+                }
+            } catch (err) {
+                imageUploadStatus.textContent = '';
+                document.getElementById('save-btn').disabled = false;
+                showError('Image upload failed.');
+            }
+        };
+
+        cancelEditBtn.onclick = clearForm;
+
+        function loadProducts() {
+            productList.innerHTML = '<p>Loading...</p>';
+            db.collection('product').get().then(snapshot => {
+                productList.innerHTML = '';
+                if (snapshot.empty) {
+                    productList.innerHTML = '<p>No products found.</p>';
+                }
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const div = document.createElement('div');
+                    div.className = 'product-item';
+                    const imgThumbs = (Array.isArray(data.images) ? data.images : []).map(url => `<img src="${url}" style="width:40px;height:40px;object-fit:cover;border-radius:3px;margin-right:3px;">`).join('');
+                    div.innerHTML = `
+                        <div class="product-info">
+                            <strong>${data.name}</strong><br>
+                            $${parseFloat(data.price).toFixed(2)}<br>
+                            <span style="font-size:0.95em;color:#666;">${data.description}</span><br>
+                            <span style="font-size:0.9em;color:#888;">Quantity: ${data.Quantity ?? 'N/A'}</span><br>
+                            ${imgThumbs}
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn" onclick="editProduct('${doc.id}', '${data.name.replace(/'/g, "\\'")}', '${data.price}', '${data.description.replace(/'/g, "\\'")}', ${JSON.stringify(data.images || [])}, '${data.Quantity}')">Edit</button>
+                            <button class="btn" style="background:#888" onclick="deleteProduct('${doc.id}')">Delete</button>
+                        </div>
+                    `;
+                    productList.appendChild(div);
+                });
+            });
+        }
+
+        window.editProduct = function(id, name, price, description, imagesArr, quantity) {
+            editingId = id;
+            document.getElementById('product-id').value = id;
+            document.getElementById('name').value = name;
+            document.getElementById('price').value = price;
+            document.getElementById('description').value = description;
+            document.getElementById('quantity').value = quantity;
+            imageFiles = [];
+            imageUrls = Array.isArray(imagesArr) ? imagesArr : [];
+            // Show image URLs as previews (read-only)
+            imageList.innerHTML = '';
+            imageUrls.forEach((url, idx) => {
+                const div = document.createElement('div');
+                div.style.position = 'relative';
+                div.innerHTML = `<img src="${url}" style="width:60px;height:60px;object-fit:cover;border-radius:4px;">`;
+                imageList.appendChild(div);
+            });
+            document.getElementById('save-btn').textContent = 'Update Product';
+            cancelEditBtn.style.display = 'inline-block';
+        };
+
+        window.deleteProduct = function(id) {
+            if (confirm('Delete this product?')) {
+                db.collection('product').doc(id).delete().then(() => {
+                    showSuccess('Product deleted!');
+                    loadProducts();
+                }).catch(err => showError('Delete failed.'));
+            }
+        };
+
+        // --- ADMIN ORDER & CUSTOMER MANAGEMENT ---
+        // Helper to fetch all users and build a map of userId to full name
+        async function getUserNameMap() {
+            const userSnapshot = await db.collection('customer').get();
+            const userMap = {};
+            userSnapshot.forEach(doc => {
+                const d = doc.data();
+                userMap[doc.id] = d.fullName || '';
+            });
+            return userMap;
+        }
+
+        function renderOrderAdmin(order, statusLabel, showActions = false, userName = '') {
+            return `<div style=\"border:1px solid #eee;border-radius:8px;margin-bottom:1.5rem;padding:1rem;\">
+                <div style=\"font-weight:bold;margin-bottom:0.5rem;\">Order ID: ${order.id}</div>
+                <div style=\"margin-bottom:0.5rem;\">Status: ${order.status || statusLabel}</div>
+                <div style=\"margin-bottom:0.5rem;\">Total: <b>P${(order.price * order.quantity || 0).toFixed(2)}</b></div>
+                <div style=\"margin-bottom:0.5rem;\">Type Shipping: <b>${order.typeShipping || ''}</b></div>
+                <div style=\"margin-bottom:0.5rem;\"><b>Customer:</b> ${userName || (order.userId || '')}</div>
+                <div><b>Product:</b></div>
+                <div style='display:flex;align-items:center;margin-bottom:0.5rem;margin-left:1rem;'>
+                  <img src='${(order.images && order.images[0]) || ''}' alt='${order.name}' style='width:60px;height:60px;object-fit:contain;border:1px solid #ddd;border-radius:6px;margin-right:10px;background:#fafafa;'>
+                  <div>
+                    <div><b>${order.name}</b></div>
+                    <div>Quantity: ${order.quantity}</div>
+                    <div>Price: P${order.price}</div>
+                  </div>
+                </div>
+                ${showActions ? `<div style='margin-top:1rem;'>
+                    <button class='btn' style='background:#888;margin-right:0.5rem;' onclick='moveToCancelled("${order.id}")'>Move to Cancelled</button>
+                    <button class='btn' style='background:#27ae60;' onclick='moveToDelivery("${order.id}")'>Move to Delivery</button>
+                </div>` : ''}
+            </div>`;
+        }
+
+        async function loadPendingOrders() {
+            const pendingList = document.getElementById('pending-list');
+            pendingList.innerHTML = '<p>Loading...</p>';
+            const userMap = await getUserNameMap();
+            db.collection('pending').get().then(snapshot => {
+                if (snapshot.empty) {
+                    pendingList.innerHTML = '<p>No pending orders found.</p>';
+                    return;
+                }
+                let html = '';
+                snapshot.forEach(doc => {
+                    const order = { id: doc.id, ...doc.data() };
+                    const userName = userMap[order.userId] || order.userId || '';
+                    html += renderOrderAdmin(order, 'pending', true, userName);
+                });
+                pendingList.innerHTML = html;
+            });
+        }
+        async function loadDeliveryOrders() {
+            const deliveryList = document.getElementById('delivery-list');
+            deliveryList.innerHTML = '<p>Loading...</p>';
+            const userMap = await getUserNameMap();
+            db.collection('delivery').get().then(snapshot => {
+                if (snapshot.empty) {
+                    deliveryList.innerHTML = '<p>No delivery orders found.</p>';
+                    return;
+                }
+                let html = '';
+                snapshot.forEach(doc => {
+                    const order = { id: doc.id, ...doc.data() };
+                    const userName = userMap[order.userId] || order.userId || '';
+                    html += renderOrderAdmin(order, 'Delivery', false, userName);
+                });
+                deliveryList.innerHTML = html;
+            });
+        }
+        async function loadCancelledOrders() {
+            const cancelledList = document.getElementById('cancelled-list');
+            cancelledList.innerHTML = '<p>Loading...</p>';
+            const userMap = await getUserNameMap();
+            db.collection('cancelled').get().then(snapshot => {
+                if (snapshot.empty) {
+                    cancelledList.innerHTML = '<p>No cancelled orders found.</p>';
+                    return;
+                }
+                let html = '';
+                snapshot.forEach(doc => {
+                    const order = { id: doc.id, ...doc.data() };
+                    const userName = userMap[order.userId] || order.userId || '';
+                    html += renderOrderAdmin(order, 'Cancelled', false, userName);
+                });
+                cancelledList.innerHTML = html;
+            });
+        }
+        async function loadCustomers() {
+            const customerList = document.getElementById('customer-list');
+            customerList.innerHTML = '<div style="text-align:center;color:#888;">Loading...</div>';
+            const snapshot = await db.collection('customer').get();
+            if (snapshot.empty) {
+                customerList.innerHTML = '<p>No customers found.</p>';
+                return;
+            }
+            let html = '<div class="customer-card-grid">';
+            snapshot.forEach(doc => {
+                const c = doc.data();
+                html += `<div class="customer-card" tabindex="0" data-id="${doc.id}">${c.fullName || ''}</div>`;
+            });
+            html += '</div>';
+            customerList.innerHTML = html;
+            // Add click listeners for customer cards
+            document.querySelectorAll('.customer-card').forEach(card => {
+                card.onclick = card.onkeypress = async function(e) {
+                    if (e.type === 'click' || (e.type === 'keypress' && (e.key === 'Enter' || e.key === ' '))) {
+                        const id = this.getAttribute('data-id');
+                        const docSnap = await db.collection('customer').doc(id).get();
+                        if (!docSnap.exists) return;
+                        const data = docSnap.data();
+                        let detailHtml = '<table style="width:100%;">';
+                        Object.entries(data).forEach(([key, value]) => {
+                            detailHtml += `<tr><td style='font-weight:bold;'>${key}</td><td>${value}</td></tr>`;
+                        });
+                        detailHtml += '</table>';
+                        customerModalBody.innerHTML = detailHtml;
+                        customerModal.style.display = 'flex';
+                    }
+                };
+            });
+        }
+
+        window.moveToCancelled = function(orderId) {
+            console.log('Move to Cancelled clicked for order:', orderId);
+            if (!confirm('Are you sure you want to move this order to Cancelled?')) return;
+            // Get the order data from pending, add to cancelled, then delete from pending
+            db.collection('pending').doc(orderId).get().then(doc => {
+                if (!doc.exists) return showError('Order not found.');
+                const data = doc.data();
+                db.collection('cancelled').add(data).then((docRef) => {
+                    // Set the id field to the new document's id
+                    db.collection('cancelled').doc(docRef.id).update({ id: docRef.id }).then(() => {
+                        db.collection('pending').doc(orderId).delete().then(() => {
+                            showSuccess('Order moved to Cancelled!');
+                            loadPendingOrders();
+                        });
+                    });
+                }).catch((err) => {
+                    console.error('Failed to move order:', err);
+                    showError('Failed to move order.');
+                });
+            });
+        };
+        window.moveToDelivery = function(orderId) {
+            console.log('Move to Delivery clicked for order:', orderId);
+            if (!confirm('Are you sure you want to move this order to Delivery?')) return;
+            // Get the order data from pending, add to delivery, then delete from pending
+            db.collection('pending').doc(orderId).get().then(doc => {
+                if (!doc.exists) return showError('Order not found.');
+                const data = doc.data();
+                db.collection('delivery').add(data).then((docRef) => {
+                    // Set the id field to the new document's id
+                    db.collection('delivery').doc(docRef.id).update({ id: docRef.id }).then(() => {
+                        db.collection('pending').doc(orderId).delete().then(() => {
+                            showSuccess('Order moved to Delivery!');
+                            loadPendingOrders();
+                        });
+                    });
+                }).catch((err) => {
+                    console.error('Failed to move order:', err);
+                    showError('Failed to move order.');
+                });
+            });
+        };
+
+        // Sign out button logic
+        document.getElementById('signout-btn').onclick = function() {       
+            window.location.href = 'index.html';
+        };
+        
+        // Load products on page load
+        window.addEventListener('DOMContentLoaded', loadProducts);
+
+        // Navigation logic
+        const navLinks = [
+            {id: 'nav-product', section: 'section-product'},
+            {id: 'nav-pending', section: 'section-pending'},
+            {id: 'nav-delivery', section: 'section-delivery'},
+            {id: 'nav-cancelled', section: 'section-cancelled'},
+            {id: 'nav-customers', section: 'section-customers'}
+        ];
+        navLinks.forEach(link => {
+            document.getElementById(link.id).onclick = function(e) {
+                e.preventDefault();
+                navLinks.forEach(l => {
+                    document.getElementById(l.section).style.display = (l.id === link.id) ? '' : 'none';
+                    document.getElementById(l.id).style.color = (l.id === link.id) ? '#e74c3c' : '#888';
+                    document.getElementById(l.id).style.fontWeight = (l.id === link.id) ? 'bold' : 'normal';
+                    document.getElementById(l.id).style.textDecoration = (l.id === link.id) ? 'underline' : 'none';
+                });
+            };
+        });
+
+        // Load data when switching tabs
+        navLinks.forEach(link => {
+            document.getElementById(link.id).addEventListener('click', function() {
+                if (link.id === 'nav-pending') loadPendingOrders();
+                if (link.id === 'nav-delivery') loadDeliveryOrders();
+                if (link.id === 'nav-cancelled') loadCancelledOrders();
+                if (link.id === 'nav-customers') loadCustomers();
+            });
+        });
+
+        // Add customer detail modal to HTML
+        const customerModalHtml = `
+<div id="customer-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:4000;align-items:center;justify-content:center;">
+  <div id="customer-modal-content" style="background:#fff;padding:2rem 2rem 1.5rem 2rem;border-radius:10px;max-width:400px;width:90vw;box-shadow:0 5px 20px rgba(0,0,0,0.2);position:relative;max-height:90vh;overflow-y:auto;">
+    <button id="close-customer-modal" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.2rem;cursor:pointer;">&times;</button>
+    <h2 style="text-align:center;color:#e74c3c;margin-bottom:1rem;">Customer Details</h2>
+    <div id="customer-modal-body"></div>
+  </div>
+</div>`;
+        document.body.insertAdjacentHTML('beforeend', customerModalHtml);
+        const customerModal = document.getElementById('customer-modal');
+        const customerModalBody = document.getElementById('customer-modal-body');
+        document.getElementById('close-customer-modal').onclick = function() {
+          customerModal.style.display = 'none';
+        };
+        customerModal.addEventListener('click', function(e) {
+          if (e.target === customerModal) customerModal.style.display = 'none';
+        });
+
+        // Add or update styles for customer card grid and modal
+        const style = document.createElement('style');
+        style.innerHTML = `
+.customer-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+.customer-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(231,76,60,0.07);
+  padding: 1.3rem 1.1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+  border: 1.5px solid #f4e3df;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #e74c3c;
+  position: relative;
+}
+.customer-card:hover, .customer-card:focus {
+  background: #fbeee6;
+  box-shadow: 0 8px 32px rgba(231,76,60,0.13);
+  color: #c0392b;
+  transform: translateY(-3px) scale(1.03);
+}
+#customer-modal-content {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  border-radius: 12px;
+  animation: popIn 0.2s;
+}
+#close-customer-modal {
+  transition: color 0.2s, background 0.2s;
+}
+#close-customer-modal:hover {
+  color: #fff;
+  background: #e74c3c;
+  border-radius: 50%;
+}
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+`;
+        document.head.appendChild(style);
+    </script>
+    <!-- Disable right-click and common dev tools shortcuts -->
+    <script>
+        (function() {
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+            document.addEventListener('keydown', function(e) {
+                // F12
+                if (e.key === 'F12') {
+                    e.preventDefault();
+                }
+                // Ctrl+Shift+I or Ctrl+Shift+J or Ctrl+U
+                if ((e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+                    (e.ctrlKey && e.key === 'U')) {
+                    e.preventDefault();
+                }
+            });
+        })();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery Orders - Amigo Clothing</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 700px;
+      margin: 3rem auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: #27ae60;
+      margin-bottom: 2rem;
+    }
+    .order-list {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    .order-list th, .order-list td {
+      padding: 1rem 0.5rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    .order-list th {
+      color: #27ae60;
+      font-size: 1.1rem;
+    }
+    .order-empty {
+      text-align: center;
+      color: #888;
+      font-size: 1.2rem;
+      margin: 2rem 0;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      color: #764ba2;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover {
+      color: #e74c3c;
+      text-decoration: underline;
+    }
+    @media (max-width: 700px) {
+      .container { padding: 1rem; }
+      .order-list th, .order-list td { padding: 0.5rem 0.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Account</a>
+    <h1>Delivery Orders</h1>
+    <div id="order-content">
+      <div style="text-align:center;color:#888;">Loading...</div>
+    </div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="firebase-config.mv"></script>
+  <script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const orderContent = document.getElementById('order-content');
+
+    function renderOrders(orders) {
+      if (!orders || orders.length === 0) {
+        orderContent.innerHTML = '<div class="order-empty">No delivery orders found.</div>';
+        return;
+      }
+      let html = '';
+      orders.forEach(order => {
+        html += `<div style="border:1px solid #eee;border-radius:8px;margin-bottom:1.5rem;padding:1rem;">
+          <div style="font-weight:bold;margin-bottom:0.5rem;">Order ID: ${order.id}</div>
+          <div style="margin-bottom:0.5rem;">Status: ${order.status || 'Delivery'}</div>
+          <div style="margin-bottom:0.5rem;">Total: <b>P${(order.price * order.quantity || 0).toFixed(2)}</b></div>
+          <div><b>Product:</b></div>
+          <div style='display:flex;align-items:center;margin-bottom:0.5rem;margin-left:1rem;'>
+            <img src='${(order.images && order.images[0]) || ''}' alt='${order.name}' style='width:60px;height:60px;object-fit:contain;border:1px solid #ddd;border-radius:6px;margin-right:10px;background:#fafafa;'>
+            <div>
+              <div><b>${order.name}</b></div>
+              <div>Quantity: ${order.quantity}</div>
+              <div>Price: P${order.price}</div>
+            </div>
+          </div>
+        </div>`;
+      });
+      orderContent.innerHTML = html;
+    }
+
+    function promptLogin() {
+      orderContent.innerHTML = '<div class="order-empty">Please <a href="index.html" style="color:#e74c3c;">log in</a> to view your orders.</div>';
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user || !user.emailVerified) {
+        promptLogin();
+        return;
+      }
+      // Fetch delivery orders from Firestore
+      const snap = await db.collection('delivery').where('userId', '==', user.uid).get();
+      const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderOrders(orders);
+    });
+  </script>
+     <!-- Disable right-click and common dev tools shortcuts -->
+     <script>
+      (function() {
+          document.addEventListener('contextmenu', function(e) {
+              e.preventDefault();
+          });
+          document.addEventListener('keydown', function(e) {
+              // F12
+              if (e.key === 'F12') {
+                  e.preventDefault();
+              }
+              // Ctrl+Shift+I or Ctrl+Shift+J or Ctrl+U
+              if ((e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+                  (e.ctrlKey && e.key === 'U')) {
+                  e.preventDefault();
+              }
+          });
+      })();
+  </script>
+</body>
+</html> 

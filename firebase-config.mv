@@ -1,0 +1,9 @@
+// Firebase Configuration - Protected
+const firebaseConfig = {
+    apiKey: "AIzaSyBy6Xfw_Q9DTui9eAnsEaKjMDTfeNXQRik",
+    authDomain: "amigo-clothing.firebaseapp.com",
+    projectId: "amigo-clothing",
+    storageBucket: "amigo-clothing.firebasestorage.app",
+    messagingSenderId: "314500916535",
+    appId: "1:314500916535:web:33184b96218b29ca7f26b2"
+};
